@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * NOTE: an existing core resource must be re-declared at the EXACT path core
+ * declares it at. acl.xml files are merged structurally (by path + id), not by
+ * id alone, so the same id nested under two different parents survives the
+ * merge and then makes Magento\Framework\Acl\Builder::getAcl() throw
+ * "LogicException: Could not create an acl object: Resource id '<id>' already
+ * exists in the ACL" — which 500s EVERY admin page, not just this module.
+ *
+ * Both chains below were cross-checked against Magento/Backend/etc/acl.xml and
+ * Magento/Config/etc/acl.xml at 2.4.8. Magenx_Platform::platform hangs directly
+ * off Magento_Backend::system rather than off the Tools group: the ACL id for
+ * that group is Magento_Backend::tools while the MENU id is
+ * Magento_Backend::system_tools (they genuinely differ in core), and there is no
+ * reason to bet an all-admin 500 on getting that pair right.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+        <resources>
+            <resource id="Magento_Backend::admin">
+                <resource id="Magento_Backend::system">
+                    <resource id="Magenx_Platform::platform" title="Platform Overview" sortOrder="90"/>
+                </resource>
+                <resource id="Magento_Backend::stores">
+                    <resource id="Magento_Backend::stores_settings">
+                        <resource id="Magento_Config::config">
+                            <resource id="Magenx_Platform::config" title="Platform Overview Settings" sortOrder="190"/>
+                        </resource>
+                    </resource>
+                </resource>
+            </resource>
+        </resources>
+    </acl>
+</config>

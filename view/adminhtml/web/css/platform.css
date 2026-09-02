@@ -1,0 +1,162 @@
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ */
+
+.magenx-platform-bar {
+    align-items: center;
+    border-bottom: 1px solid #d6d6d6;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.magenx-platform-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.magenx-platform-tab {
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: #303030;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 10px 14px;
+}
+
+.magenx-platform-tab._active {
+    border-bottom-color: #007bdb;
+    font-weight: 600;
+}
+
+.magenx-platform-dot {
+    border-radius: 50%;
+    display: inline-block;
+    height: 9px;
+    margin-right: 7px;
+    vertical-align: middle;
+    width: 9px;
+}
+
+.magenx-platform-dot[data-status="pending"] { background: #cfcfcf; }
+.magenx-platform-dot[data-status="ok"],
+.magenx-platform-dot[data-status="info"] { background: #79a22e; }
+.magenx-platform-dot[data-status="warn"] { background: #eb5202; }
+.magenx-platform-dot[data-status="unavailable"] { background: #8f8f8f; }
+.magenx-platform-dot[data-status="error"] { background: #e22626; }
+
+.magenx-platform-actions {
+    align-items: center;
+    display: flex;
+    gap: 12px;
+}
+
+.magenx-platform-meta {
+    color: #6f6f6f;
+    font-size: 12px;
+}
+
+.magenx-platform-panel { display: none; }
+.magenx-platform-panel._active { display: block; }
+
+.magenx-platform-summary {
+    align-items: baseline;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.magenx-platform-badge {
+    border-radius: 3px;
+    color: #fff;
+    font-size: 11px;
+    letter-spacing: .04em;
+    padding: 2px 8px;
+    text-transform: uppercase;
+}
+
+.magenx-platform-summary._status-ok .magenx-platform-badge { background: #79a22e; }
+.magenx-platform-summary._status-warn .magenx-platform-badge { background: #eb5202; }
+.magenx-platform-summary._status-unavailable .magenx-platform-badge { background: #8f8f8f; }
+.magenx-platform-summary._status-error .magenx-platform-badge { background: #e22626; }
+
+.magenx-platform-summary-text { color: #303030; }
+
+.magenx-platform-grid {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+}
+
+.magenx-platform-card {
+    background: #fff;
+    border: 1px solid #d6d6d6;
+    border-left-width: 4px;
+    padding: 14px 16px;
+}
+
+.magenx-platform-card._status-ok,
+.magenx-platform-card._status-info { border-left-color: #79a22e; }
+.magenx-platform-card._status-warn { border-left-color: #eb5202; }
+.magenx-platform-card._status-unavailable { border-left-color: #8f8f8f; }
+.magenx-platform-card._status-error { border-left-color: #e22626; }
+
+.magenx-platform-card-title {
+    border-bottom: 1px solid #ececec;
+    font-size: 14px;
+    margin: 0 0 10px;
+    padding-bottom: 8px;
+}
+
+.magenx-platform-row {
+    border-bottom: 1px solid #f4f4f4;
+    display: flex;
+    gap: 16px;
+    justify-content: space-between;
+    padding: 7px 0;
+}
+
+.magenx-platform-row:last-child { border-bottom: 0; }
+
+.magenx-platform-row-label {
+    color: #6f6f6f;
+    flex: 1 1 55%;
+    font-size: 13px;
+}
+
+.magenx-platform-row-hint {
+    color: #8f8f8f;
+    display: block;
+    font-size: 11px;
+    line-height: 1.4;
+    margin-top: 2px;
+}
+
+.magenx-platform-row-value {
+    flex: 0 1 45%;
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+    font-size: 13px;
+    text-align: right;
+    word-break: break-word;
+}
+
+.magenx-platform-row._status-warn .magenx-platform-row-value { color: #b34a00; font-weight: 600; }
+.magenx-platform-row._status-error .magenx-platform-row-value { color: #c00; font-weight: 600; }
+.magenx-platform-row._status-ok .magenx-platform-row-value { color: #4a7a00; }
+
+.magenx-platform-footnote {
+    color: #8f8f8f;
+    font-size: 12px;
+    margin-top: 24px;
+    max-width: 70ch;
+}
+
+.magenx-platform-loading { color: #8f8f8f; }

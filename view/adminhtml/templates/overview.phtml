@@ -1,0 +1,63 @@
+<?php
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * @var \Magenx\Platform\Block\Adminhtml\Overview $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$tabs = $block->getTabs();
+?>
+<?php if (!$block->isPlatformEnabled()): ?>
+    <div class="message message-notice">
+        <?= $escaper->escapeHtml(__('Platform Overview is switched off.')) ?>
+        <a href="<?= $escaper->escapeUrl($block->getConfigUrl()) ?>"><?= $escaper->escapeHtml(__('Turn it on in configuration.')) ?></a>
+    </div>
+<?php elseif ($tabs === []): ?>
+    <div class="message message-notice">
+        <?= $escaper->escapeHtml(__('No tabs are enabled.')) ?>
+        <a href="<?= $escaper->escapeUrl($block->getConfigUrl()) ?>"><?= $escaper->escapeHtml(__('Choose which backends to show.')) ?></a>
+    </div>
+<?php else: ?>
+    <div class="magenx-platform" data-mage-init='<?= $escaper->escapeHtmlAttr($block->getJsInit()) ?>'>
+        <div class="magenx-platform-bar">
+            <ul class="magenx-platform-tabs" role="tablist">
+                <?php foreach ($tabs as $index => $tab): ?>
+                    <li>
+                        <button type="button"
+                                class="magenx-platform-tab<?= $index === 0 ? ' _active' : '' ?>"
+                                role="tab"
+                                data-collector="<?= $escaper->escapeHtmlAttr($tab['code']) ?>"
+                                aria-selected="<?= $index === 0 ? 'true' : 'false' ?>">
+                            <span class="magenx-platform-dot" data-status="pending"></span>
+                            <span class="magenx-platform-tab-label"><?= $escaper->escapeHtml($tab['label']) ?></span>
+                        </button>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+            <div class="magenx-platform-actions">
+                <span class="magenx-platform-meta" data-role="meta"></span>
+                <button type="button" class="action-secondary" data-role="refresh">
+                    <?= $escaper->escapeHtml(__('Refresh')) ?>
+                </button>
+            </div>
+        </div>
+
+        <?php foreach ($tabs as $index => $tab): ?>
+            <section class="magenx-platform-panel<?= $index === 0 ? ' _active' : '' ?>"
+                     data-panel="<?= $escaper->escapeHtmlAttr($tab['code']) ?>">
+                <p class="magenx-platform-loading"><?= $escaper->escapeHtml(__('Loading…')) ?></p>
+            </section>
+        <?php endforeach; ?>
+
+        <p class="magenx-platform-footnote">
+            <?= $escaper->escapeHtml(
+                __(
+                    'Figures are read live from the running services. OPcache values describe the single PHP-FPM '
+                    . 'worker that answered this request, not the whole pool — the process manager rows below them '
+                    . 'are pool-wide.'
+                )
+            ) ?>
+        </p>
+    </div>
+<?php endif; ?>

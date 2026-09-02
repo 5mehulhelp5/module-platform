@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * The module is inert until an admin opens the page — it runs no cron, writes
+ * nothing and touches no request path — so it ships on. The status endpoints
+ * default to the internal Docker network addresses this stack publishes.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <magenx_platform>
+            <general>
+                <enabled>1</enabled>
+                <timeout>3</timeout>
+                <cache_ttl>10</cache_ttl>
+                <auto_refresh>0</auto_refresh>
+            </general>
+            <collectors>
+                <enabled_collectors>mariadb,redis,rabbitmq,opensearch,php,nginx</enabled_collectors>
+            </collectors>
+            <endpoints>
+                <nginx_status_url>http://nginx/nginx_status</nginx_status_url>
+                <fpm_status_url>http://nginx/fpm_status</fpm_status_url>
+                <rabbitmq_management_url/>
+            </endpoints>
+        </magenx_platform>
+    </default>
+</config>
