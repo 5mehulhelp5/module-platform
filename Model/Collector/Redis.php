@@ -269,7 +269,14 @@ class Redis implements CollectorInterface
 
         // Credis returns this section either preparsed or as "keys=1,expires=0,avg_ttl=0".
         if (is_string($keyspace)) {
-            parse_str(str_replace(',', '&', $keyspace), $keyspace);
+            $parsed = [];
+            foreach (explode(',', $keyspace) as $pair) {
+                $parts = explode('=', $pair, 2);
+                if (count($parts) === 2) {
+                    $parsed[trim($parts[0])] = trim($parts[1]);
+                }
+            }
+            $keyspace = $parsed;
         }
 
         $result->add(

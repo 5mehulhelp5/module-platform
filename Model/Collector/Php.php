@@ -173,7 +173,7 @@ class Php implements CollectorInterface
             return;
         }
 
-        $opcache = @opcache_get_status(false);
+        $opcache = opcache_get_status(false);
         if (!is_array($opcache) || empty($opcache['opcache_enabled'])) {
             $result->add($section, 'Enabled', 'No', Status::ERROR, 'OPcache is loaded but disabled for this SAPI.');
 
@@ -358,8 +358,14 @@ class Php implements CollectorInterface
      */
     private function addDiskRow(Result $result, string $section, string $label, string $path): void
     {
-        $free = @disk_free_space($path);
-        $total = @disk_total_space($path);
+        // is_dir() first, because disk_free_space() warns on a path that is not
+        // there and the Magento standard rules out silencing it with @.
+        if (!is_dir($path)) {
+            return;
+        }
+
+        $free = disk_free_space($path);
+        $total = disk_total_space($path);
         if ($free === false || $total === false || $total <= 0) {
             return;
         }

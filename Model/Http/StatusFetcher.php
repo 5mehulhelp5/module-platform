@@ -49,8 +49,11 @@ class StatusFetcher
     {
         $this->lastError = '';
 
-        $scheme = strtolower((string) parse_url($url, PHP_URL_SCHEME));
-        if (!in_array($scheme, ['http', 'https'], true)) {
+        // A scheme prefix test rather than the URL-parsing helper the Magento
+        // standard discourages: only http and https may be probed. The URLs
+        // come from admin config, which is ACL-gated, but a status probe still
+        // has no business speaking file:// on the strength of a typo.
+        if (preg_match('#^https?://#i', $url) !== 1) {
             $this->lastError = 'Only http and https URLs can be probed.';
 
             return null;
