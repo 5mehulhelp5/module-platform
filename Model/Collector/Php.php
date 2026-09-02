@@ -15,6 +15,8 @@ use Magenx\Platform\Model\Metric\Result;
 use Magenx\Platform\Model\Metric\ResultFactory;
 use Magenx\Platform\Model\Metric\Status;
 use Magento\Framework\App\Filesystem\DirectoryList;
+use Magento\Framework\Exception\FileSystemException;
+use Magento\Framework\Filesystem\DriverInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 
 /**
@@ -49,6 +51,8 @@ class Php implements CollectorInterface
 
     private DirectoryList $directoryList;
 
+    private DriverInterface $filesystemDriver;
+
     private ResultFactory $resultFactory;
 
     private Formatter $formatter;
@@ -60,6 +64,7 @@ class Php implements CollectorInterface
      * @param Config $config
      * @param Json $json
      * @param DirectoryList $directoryList
+     * @param DriverInterface $filesystemDriver
      * @param ResultFactory $resultFactory
      * @param Formatter $formatter
      * @param Status $status
@@ -69,6 +74,7 @@ class Php implements CollectorInterface
         Config $config,
         Json $json,
         DirectoryList $directoryList,
+        DriverInterface $filesystemDriver,
         ResultFactory $resultFactory,
         Formatter $formatter,
         Status $status
@@ -77,6 +83,7 @@ class Php implements CollectorInterface
         $this->config = $config;
         $this->json = $json;
         $this->directoryList = $directoryList;
+        $this->filesystemDriver = $filesystemDriver;
         $this->resultFactory = $resultFactory;
         $this->formatter = $formatter;
         $this->status = $status;
@@ -358,9 +365,15 @@ class Php implements CollectorInterface
      */
     private function addDiskRow(Result $result, string $section, string $label, string $path): void
     {
-        // is_dir() first, because disk_free_space() warns on a path that is not
-        // there and the Magento standard rules out silencing it with @.
-        if (!is_dir($path)) {
+        // Check the directory is there first, because disk_free_space() warns on
+        // a path that is not and the Magento standard rules out silencing it
+        // with @. The check goes through the filesystem driver, which is what
+        // the standard wants in place of the plain directory-test function.
+        try {
+            if (!$this->filesystemDriver->isDirectory($path)) {
+                return;
+            }
+        } catch (FileSystemException $e) {
             return;
         }
 
