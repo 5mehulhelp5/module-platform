@@ -1,0 +1,83 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * The stack is one deployment, so every field here is default scope only —
+ * there is nothing per-website or per-store about the health of the containers
+ * this Magento talks to.
+ *
+ * Connection details are deliberately absent: hosts, ports and credentials for
+ * MariaDB, Redis, RabbitMQ and OpenSearch are read from app/etc/env.php and
+ * core_config_data, which is where they already are. Re-entering them here
+ * would create a second source of truth that silently goes stale.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="magenx" translate="label" sortOrder="400">
+            <label>Magenx</label>
+        </tab>
+        <section id="magenx_platform" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="0" showInStore="0">
+            <class>separator-top</class>
+            <label>Platform Overview</label>
+            <tab>magenx</tab>
+            <resource>Magenx_Platform::config</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1">
+                <label>General</label>
+                <field id="enabled" translate="label comment" type="select" sortOrder="10" showInDefault="1" canRestoreToDefault="1">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>Master switch. When set to No the Platform Overview page renders a notice and no backend is contacted.</comment>
+                </field>
+                <field id="timeout" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestoreToDefault="1">
+                    <label>Backend Timeout (seconds)</label>
+                    <validate>validate-digits validate-greater-than-zero</validate>
+                    <comment>Connect and read timeout applied to every backend probe. A backend that exceeds it is reported as unavailable instead of hanging the tab. Keep it low — 3 seconds is usually plenty on a private Docker network.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="cache_ttl" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestoreToDefault="1">
+                    <label>Result Cache (seconds)</label>
+                    <validate>validate-digits</validate>
+                    <comment>How long a collected snapshot is reused before the backend is probed again. Stops a held-down refresh from hammering the stack. Set to 0 to always probe live.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="auto_refresh" translate="label comment" type="text" sortOrder="40" showInDefault="1" canRestoreToDefault="1">
+                    <label>Auto Refresh (seconds)</label>
+                    <validate>validate-digits</validate>
+                    <comment>Interval at which the open tab reloads itself in the browser. Set to 0 for manual refresh only. Values below the result cache above just re-read the cache.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+            </group>
+            <group id="collectors" translate="label" type="text" sortOrder="20" showInDefault="1">
+                <label>Tabs</label>
+                <field id="enabled_collectors" translate="label comment" type="multiselect" sortOrder="10" showInDefault="1" canRestoreToDefault="1">
+                    <label>Show Tabs</label>
+                    <source_model>Magenx\Platform\Model\Config\Source\Collectors</source_model>
+                    <comment>Which backends get a tab. Deselect anything this deployment does not run, so its tab does not sit permanently red.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+            </group>
+            <group id="endpoints" translate="label comment" type="text" sortOrder="30" showInDefault="1">
+                <label>Status Endpoints</label>
+                <comment>Only these three backends need an address configured. Nginx and PHP-FPM publish their stats over HTTP rather than through a client library, and RabbitMQ reports nothing over AMQP itself — its numbers come from the management API.</comment>
+                <field id="nginx_status_url" translate="label comment" type="text" sortOrder="10" showInDefault="1" canRestoreToDefault="1">
+                    <label>Nginx Status URL</label>
+                    <comment>URL of an nginx stub_status endpoint, reachable from the PHP container. Leave empty to disable the Nginx tab's probe.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="fpm_status_url" translate="label comment" type="text" sortOrder="20" showInDefault="1" canRestoreToDefault="1">
+                    <label>PHP-FPM Status URL</label>
+                    <comment>URL of the php-fpm pm.status_path endpoint, reachable from the PHP container. The module appends its own query string to request JSON. Leave empty to show in-process PHP metrics only.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+                <field id="rabbitmq_management_url" translate="label comment" type="text" sortOrder="30" showInDefault="1" canRestoreToDefault="1">
+                    <label>RabbitMQ Management URL</label>
+                    <comment>Base URL of the RabbitMQ management API, for example http://rabbitmq:15672. Leave empty to derive it from the amqp host in app/etc/env.php on port 15672. Credentials are always taken from env.php, never entered here.</comment>
+                    <depends><field id="enabled">1</field></depends>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

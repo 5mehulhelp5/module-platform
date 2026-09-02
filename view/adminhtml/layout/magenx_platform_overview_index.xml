@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * A dashboard is not a record form, so this is a plain block and template
+ * rather than a ui_component listing — same reasoning as the Help Desk ticket
+ * workspace.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="Magenx_Platform::css/platform.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magenx\Platform\Block\Adminhtml\Overview" name="magenx_platform.overview" template="Magenx_Platform::overview.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

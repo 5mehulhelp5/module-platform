@@ -1,0 +1,22 @@
+{
+    "name": "magenxcommerce/module-platform",
+    "description": "Platform status dashboard for the Magento admin — live health and metrics for MariaDB, Redis, RabbitMQ, OpenSearch, PHP-FPM and Nginx, read from the connection details Magento already holds. Read-only, admin-only, no storefront surface.",
+    "type": "magento2-module",
+    "license": "MIT",
+    "require": {
+        "php": "~8.3.0||~8.4.0||~8.5.0",
+        "colinmollenhour/credis": "*",
+        "magento/framework": "*",
+        "magento/module-backend": "*",
+        "magento/module-config": "*",
+        "magento/module-store": "*"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Magenx\\Platform\\": ""
+        }
+    }
+}

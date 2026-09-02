@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * NOTE: `parent` values are NOT validated by menu.xsd. An id that does not exist
+ * makes Magento\Backend\Model\Menu\Builder throw OutOfRangeException from
+ * getStartupPageUrl(), which 500s EVERY admin page — not just this menu. The
+ * parent below (Magento_Backend::system_tools — the System > Tools group that
+ * holds Cache Management and Index Management) was cross-checked against the
+ * core <add id=…> set at 2.4.8. Note that the menu id and the ACL id for that
+ * group differ in core: the menu is Magento_Backend::system_tools, its ACL
+ * resource is Magento_Backend::tools.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Magenx_Platform::platform" title="Platform Overview" module="Magenx_Platform" sortOrder="90"
+             parent="Magento_Backend::system_tools" action="magenx_platform/overview/index"
+             resource="Magenx_Platform::platform"/>
+    </menu>
+</config>

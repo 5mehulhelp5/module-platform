@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © MagenX. All rights reserved.
+ * SPDX-License-Identifier: MIT
+ *
+ * The array keys below ARE the collector codes: they key the pool, they are the
+ * stored values of magenx_platform/collectors/enabled_collectors, and they are
+ * the ?collector= parameter of the metrics endpoint. Adding a backend is one
+ * class plus one line here.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magenx\Platform\Model\CollectorPool">
+        <arguments>
+            <argument name="collectors" xsi:type="array">
+                <item name="mariadb" xsi:type="object">Magenx\Platform\Model\Collector\MariaDb</item>
+                <item name="redis" xsi:type="object">Magenx\Platform\Model\Collector\Redis</item>
+                <item name="rabbitmq" xsi:type="object">Magenx\Platform\Model\Collector\RabbitMq</item>
+                <item name="opensearch" xsi:type="object">Magenx\Platform\Model\Collector\OpenSearch</item>
+                <item name="php" xsi:type="object">Magenx\Platform\Model\Collector\Php</item>
+                <item name="nginx" xsi:type="object">Magenx\Platform\Model\Collector\Nginx</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
