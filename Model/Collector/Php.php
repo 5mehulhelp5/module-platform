@@ -1467,11 +1467,18 @@ class Php implements CollectorInterface
         $uid = $this->effectiveUid();
         $entry = $uid === null ? [] : $this->passwdEntry($uid);
 
-        return $this->effectiveUser = [
+        // Stored and then returned, rather than assigned inside the return.
+        // Squiz.PHP.DisallowMultipleAssignments wants an assignment to be the
+        // first thing on its line, and nothing else in this module assigns
+        // inside a return — so this was the one place that read differently
+        // from the rest of it for no gain.
+        $this->effectiveUser = [
             'user' => (string) ($entry['name'] ?? ''),
             'uid' => $uid,
             'home' => (string) ($entry['home'] ?? ''),
         ];
+
+        return $this->effectiveUser;
     }
 
     /**
