@@ -35,7 +35,7 @@ log line.
 | **Redis** | `\Credis_Client` against each configured instance (default cache, page cache, sessions) | Memory against `maxmemory`, eviction policy, evicted keys, hit rate, key count, last background save |
 | **RabbitMQ** | HTTP management API | Node alarms, memory and disk headroom, and per-queue depth against consumer count |
 | **OpenSearch** | HTTP, engine derived from `catalog/search/engine` | Cluster colour, unassigned shards, JVM heap with committed size and the young/old generation pools, old-generation GC counters, node disk, the store's own indices with doc counts, and which credentials the search configuration resolved to |
-| **PHP / FPM** | `opcache_get_status()` and friends in-process, plus the php-fpm status page | Every block OPcache publishes — memory and free memory, wasted memory against the percentage it restarts at, the `cache_full` flag, the interned string buffer, cached scripts and cached keys, hit rate with the counters behind it, blacklist misses, the three restart causes counted separately, a restart in flight, when the cache started and last emptied, JIT and its buffer, and preloading — missing required extensions and missing recommended ones (`redis`, `igbinary`), every field the FPM status page publishes — pool, process manager, start time and uptime, accepted connections with their average rate, the listen queue live and at its high-water mark against the socket backlog, idle/active/total and peak-active processes, `max children reached`, slow requests and memory peak — plus host load and disk |
+| **PHP / FPM** | `opcache_get_status()` and friends in-process, plus the php-fpm status page | Every block OPcache publishes — memory and free memory, wasted memory against the percentage it restarts at, the `cache_full` flag, the interned string buffer, cached scripts and cached keys, hit rate with the counters behind it, blacklist misses, the three restart causes counted separately, a restart in flight, when the cache started and last emptied, JIT and its buffer, and preloading — missing required extensions and missing recommended ones (`redis`, `igbinary`), every field the FPM status page publishes — pool, process manager, start time and uptime, accepted connections with their average rate, the listen queue live and at its high-water mark against the socket backlog, idle/active/total and peak-active processes, `max children reached`, slow requests and memory peak — plus the hardening reads: the user FPM runs as, every path it can write measured against the `tmp/` + `var/` + `pub/media/` allowlist, which of `auth.json`, `.git`, `.github`, `deploy*` and the PHP user's home dotfiles it can read, whether process-spawning functions are disabled, and whether cron is reachable — plus host load and disk |
 | **Nginx** | `stub_status` | Active connections, dropped connections, requests per connection, worker read/write/wait state. The endpoint URL rides in the tab's summary line rather than a card of its own |
 | **imgproxy** | Prometheus `/metrics` | Error rate and errors split by type, 5xx share of requests, worker utilization, the queue/downloading/processing spans — which separate a saturated imgproxy from a slow origin from an expensive image — and libvips memory against its peak |
 
@@ -272,6 +272,30 @@ silently reverting.
   the Nginx status URL and the RabbitMQ management URL: both are admin-entered and both are
   rendered through `StatusFetcher::redact()`, so userinfo pasted into either never comes
   back out on the page.
+- **Three writable paths is the whole allowlist.** `tmp/`, `var/` and `pub/media/` are
+  everything the PHP user needs, in production and in development alike, and the Hardening rows
+  grade against exactly that. `generated/` and `pub/static/` get no developer-mode exemption:
+  they are build output, produced by `setup:di:compile` and `setup:static-content:deploy` in the
+  pipeline and shipped read-only, and a writable one lets a single upload become code that is
+  executed or served. Two things decide how to read the rows. The probe is one level deep — the
+  root's immediate children, plus `app/etc`, `app/etc/env.php`, `generated/` and `pub/static/` by
+  name — because a recursive walk of `vendor/` inside an admin request is not a thing to do; and
+  `is_writable()` answers `true` for everything when the pool runs as root, which is why `Runs As`
+  is the first row and goes red on uid 0.
+- **Write access is not the whole exposure.** Some paths must not be readable by the PHP user
+  either, because opening them is already the breach: `auth.json` is the Marketplace and
+  repo.magento.com keys, `.git/` is the source and its history along with whatever `.git/config`
+  holds, `.github/` describes how the site is deployed and `deploy*` is the deployment, and the
+  PHP user's own `.ssh/`, `.composer/`, `.config/`, `.local/`, `.cache/` and `.bash*` hold ssh
+  keys, composer tokens and shell history. None of it is read while serving a page. The home
+  half is skipped when the PHP user's home lies inside the Magento root, so nothing is reported
+  twice, and `deploy*` and `.bash*` are matched as globs because both are families.
+- **Cron is a separate foothold from code execution.** A writable `/etc/cron.d`, `/etc/crontab`
+  or cron spool entry is an error on its own, whatever `disable_functions` says — writing a file
+  spawns no process, and the job it schedules outlives the webshell being found. `crontab(1)`
+  being executable is an error only when PHP can also start a process and `cron.allow` /
+  `cron.deny` does not already deny this user. Magento's own cron belongs to a separate system
+  user or container; the FPM pool should have no way to install a job at all.
 - **The endpoint fields are the sensitive surface.** An admin who holds
   `Magenx_Platform::config` can point the four endpoint settings at any `http` or `https`
   URL and make the PHP container issue a GET to it — which is the feature, since the whole
